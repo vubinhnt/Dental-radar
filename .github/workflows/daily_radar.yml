@@ -1,0 +1,55 @@
+name: Dental Radar Daily Pipeline
+
+on:
+  schedule:
+    # 23:00 UTC = 06:00 sáng giờ Việt Nam mỗi ngày
+    - cron: '0 23 * * *'
+  workflow_dispatch: # Cho phép bấm nút chạy thủ công bất cứ lúc nào
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cài đặt thư viện
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Chạy Pipeline phân tích & tạo HTML
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python pipeline.py
+
+      - name: Cấu hình GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Tải thư mục dist lên Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+      - name: Triển khai lên GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
