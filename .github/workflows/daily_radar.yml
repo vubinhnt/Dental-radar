@@ -38,7 +38,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Chạy Pipeline phân tích & tạo HTML
+      - name: 1. Cào dữ liệu tự động (Tạo raw_posts.json)
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: |
+          python collector.py
+
+      - name: 2. Phân tích qua Gemini Flash & Xuất HTML
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
