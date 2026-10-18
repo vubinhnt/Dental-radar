@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dental Radar - Thị Trường & Công Nghệ Nha Khoa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-indigo-900 text-white shadow-md border-b border-indigo-700">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">🦷</span>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Dental Radar Vietnam</h1>
+          <p class="text-indigo-200 text-sm mt-1">Hệ thống tổng hợp & phân tích thị trường vật tư, thiết bị & công nghệ nha khoa tự động</p>
+        </div>
+      </div>
+      <div class="mt-4 text-xs text-indigo-300">
+        Cập nhật lần cuối: <span class="font-semibold text-white">{{ update_time }}</span> | Tổng số tin tinh tuyển: <span class="font-semibold text-white">{{ items|length }}</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for item in items %}
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden">
+        <div class="p-5">
+          <!-- Phân loại Badge -->
+          <div class="flex flex-wrap gap-2 mb-3">
+            {% if item.primary_category == 'LEGAL_POLICY' %}
+              <span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-0.5 rounded">Pháp Lý & Thể Chế</span>
+            {% elif item.primary_category == 'MATERIAL_EQUIPMENT' %}
+              <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded">Vật Tư & Máy Móc</span>
+            {% elif item.primary_category == 'INNOVATION_TECH' %}
+              <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-0.5 rounded">Đổi Mới & R&D</span>
+            {% else %}
+              <span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-0.5 rounded">Thực Địa & Lâm Sàng</span>
+            {% endif %}
+
+            {% for spec in item.sub_specialty %}
+              <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded">{{ spec }}</span>
+            {% endfor %}
+          </div>
+
+          <!-- Tiêu đề & Tóm tắt -->
+          <h2 class="text-base font-bold text-slate-900 leading-snug mb-2">{{ item.core_insight.headline }}</h2>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">{{ item.core_insight.summary }}</p>
+
+          <!-- Thực thể được nhắc tới -->
+          {% if item.entities_mentioned %}
+          <div class="bg-slate-50 p-2.5 rounded-lg text-xs mb-3 space-y-1">
+            {% if item.entities_mentioned.brands_or_manufacturers %}
+              <div><strong class="text-slate-700">Thương hiệu:</strong> {{ item.entities_mentioned.brands_or_manufacturers | join(', ') }}</div>
+            {% endif %}
+            {% if item.entities_mentioned.materials_or_devices %}
+              <div><strong class="text-slate-700">Thiết bị/Vật liệu:</strong> {{ item.entities_mentioned.materials_or_devices | join(', ') }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Cảm xúc & Bàn luận từ Comment -->
+          <div class="border-t border-slate-100 pt-3">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-medium text-slate-500">Thảo luận thực địa:</span>
+              {% if item.community_sentiment_and_discussion.overall_sentiment == 'CONTROVERSIAL' %}
+                <span class="text-amber-600 font-semibold">Tranh cãi chuyên môn</span>
+              {% elif item.community_sentiment_and_discussion.overall_sentiment == 'SKEPTICAL_NEGATIVE' %}
+                <span class="text-red-600 font-semibold">Nhiều phàn nàn</span>
+              {% else %}
+                <span class="text-emerald-600 font-semibold">Đánh giá tích cực</span>
+              {% endif %}
+            </div>
+            <p class="text-xs text-slate-500 italic bg-amber-50/50 p-2 rounded border border-amber-100">
+              "{{ item.community_sentiment_and_discussion.consensus_verdict }}"
+            </p>
+          </div>
+        </div>
+
+        <!-- Khuyến nghị hành động -->
+        <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 text-xs text-slate-600">
+          <span class="font-semibold text-slate-700">Khuyến nghị:</span> {{ item.actionable_takeaway }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <footer class="mt-16 border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+    Dental Radar Engine &copy; Tự động tổng hợp và biên tập bằng mã nguồn mở.
+  </footer>
+</body>
+</html>
