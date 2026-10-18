@@ -4,7 +4,7 @@ on:
   schedule:
     # 23:00 UTC = 06:00 sáng giờ Việt Nam mỗi ngày
     - cron: '0 23 * * *'
-  workflow_dispatch: # Cho phép bấm nút chạy thủ công bất cứ lúc nào
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,7 +20,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: "node24"
 
     steps:
       - name: Checkout mã nguồn
@@ -33,7 +35,7 @@ jobs:
 
       - name: Cài đặt thư viện
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Chạy Pipeline phân tích & tạo HTML
@@ -43,7 +45,7 @@ jobs:
           python pipeline.py
 
       - name: Cấu hình GitHub Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Tải thư mục dist lên Pages Artifact
         uses: actions/upload-pages-artifact@v3
